@@ -1,0 +1,23 @@
+# CRAFT ENVIRONMENT
+.env.php
+.env.sh
+.env
+
+# COMPOSER
+/vendor
+
+# BUILD FILES
+/node_modules/*
+
+# MISC FILES
+.DS_Store
+.idea
+.vscode
+.phpunit.result.cache
+.php_cs.cache
+.php-cs-fixer.cache
+*.code-workspace
+cghooks.lock
+yarn-error.log
+lerna-debug.log
+npm-debug.log

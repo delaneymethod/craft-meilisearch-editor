@@ -1,0 +1,174 @@
+{% extends "_layouts/cp" %}
+
+{% import "_includes/forms" as forms %}
+
+{% set fullPageForm = true %}
+
+{% do view.registerAssetBundle("delaneymethod\\meilisearcheditor\\assetbundles\\EditIndexAsset") %}
+
+{% if isNew %}
+	{% set title = "Create a new index"|t %}
+
+	{% set crumbs = [{
+		label: "Meilisearch Editor"|t,
+		url: url("meilisearch-editor/indexes"),
+	}, {
+		label: "Indexes"|t,
+		url: url("meilisearch-editor/indexes"),
+	}, {
+		label: "Untitled index"|t,
+		url: url("meilisearch-editor/indexes"),
+	}] %}
+{% else %}
+	{% set title = index.label %}
+
+	{% set crumbs = [{
+		label: "Meilisearch Editor"|t,
+		url: url("meilisearch-editor/indexes"),
+	}, {
+		label: "Indexes"|t,
+		url: url("meilisearch-editor/indexes"),
+	}, {
+		label: index.label,
+		url: url("meilisearch-editor/indexes/" ~ index.handle),
+	}] %}
+{% endif %}
+
+{% block actionButton %}
+	<div class="buttons">
+		<div class="btngroup submit">
+			<button type="submit" class="btn submit">{{ "Save"|t }}</button>
+		</div>
+	</div>
+{% endblock %}
+
+{% js at head %}
+	window.meilisearchEditorEditIndex = {{ index|json_encode|raw }};
+{% endjs %}
+
+{% block content %}
+	<form method="post" accept-charset="UTF-8">
+		{{ csrfInput() }}
+		{{ actionInput("meilisearch-editor/indexes/save") }}
+
+		{{ forms.textField({
+			first: true,
+			label: "Label"|t,
+			id: "meilisearch-editor-label",
+			name: "label",
+			value: index.label ?? "",
+			required: true,
+			instructions: "A human-friendly name for this index."|t,
+		}) }}
+
+		{{ forms.textField({
+			label: "Handle"|t,
+			id: "meilisearch-editor-handle",
+			name: "handle",
+			value: index.handle ?? "",
+			required: true,
+			readonly: not isNew,
+			instructions: "Used in the Meilisearch index uid."|t,
+			class: "disabled",
+		}) }}
+
+		{{ forms.lightswitchField({
+			label: "Site-Aware"|t,
+			id: "meilisearch-editor-site-aware",
+			name: "siteAware",
+			on: index.siteAware ?? false,
+			instructions: "Create a separate index per selected site."|t,
+		}) }}
+
+		{{ forms.selectField({
+			id: "meilisearch-editor-single-site",
+			name: "siteId",
+			label: "Site"|t,
+			options: sites|map(site => {
+				label: site.name,
+				value: site.id,
+			}),
+			value: index.siteId ?? (sites|first).id,
+		}) }}
+
+		{% set selectedSiteIds = index.siteIds ?? (index.siteId is defined ? [index.siteId] : []) %}
+		{{ forms.checkboxSelectField({
+			label: "Sites"|t,
+			id: "meilisearch-editor-multiple-site",
+			name: "siteIds",
+			options: sites|map(site => {
+				label: site.name,
+				value: site.id,
+			}),
+			values: selectedSiteIds,
+			instructions: "Choose which sites should get their own index."|t,
+		}) }}
+
+		{{ forms.lightswitchField({
+			label: "Enabled"|t,
+			name: "enabled",
+			on: index.enabled ?? true
+		}) }}
+
+		<input type="hidden" name="sections[]" value="">
+		{% set selectedSections = index.sections ?? [] %}
+		{{ forms.checkboxSelectField({
+			label: "Sections"|t,
+			id: "meilisearch-editor-sections",
+			name: "sections",
+			options: sections|map(section => {
+				label: section.name,
+				value: section.handle,
+			}),
+			required: true,
+			values: selectedSections,
+			instructions: "Choose which sections you want to use."|t,
+		}) }}
+
+		<div id="meilisearch-editor-entry-types-field" class="field" aria-labelledby="meilisearch-editor-entry-types-label" data-attribute="meilisearch-editor-entry-types"></div>
+
+		<div id="meilisearch-editor-fields-field" class="field" aria-labelledby="meilisearch-editor-fields-label" data-attribute="meilisearch-editor-fields"></div>
+
+		<div id="meilisearch-editor-image-transforms-field" class="field" aria-labelledby="meilisearch-editor-image-transforms-label" data-attribute="meilisearch-editor-image-transforms"></div>
+
+		{% set selectedAttributes = (index.attributes ?? [])|join(', ') %}
+		{{ forms.checkboxSelectField({
+			label: "Attributes"|t,
+			id: "attributes",
+			name: "attributes",
+			options: attributes|map((label, value) => {
+				label,
+				value,
+			}),
+			values: selectedAttributes,
+			instructions: "Attributes to include in the document."|t
+		}) }}
+
+		{% set selectedSortables = (index.sortable ?? [])|join(', ') %}
+		{{ forms.checkboxSelectField({
+			label: "Sortable attributes"|t,
+			id: "sortable",
+			name: "sortable",
+			options: sortables|map((label, value) => {
+				label,
+				value,
+			}),
+			values: selectedSortables,
+			instructions: "Attributes that can be used for sorting."|t
+		}) }}
+
+		{% set selectedFilterables = (index.filterable ?? [])|join(', ') %}
+		{{ forms.checkboxSelectField({
+			label: "Filterable fields"|t,
+			id: "filterable",
+			name: "filterable",
+			options: filterables|map((label, value) => {
+				label,
+				value,
+			}),
+			values: selectedFilterables,
+			instructions: "Fields that can be used for filtering."|t
+		}) }}
+
+	</form>
+{% endblock %}

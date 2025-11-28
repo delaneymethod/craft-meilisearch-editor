@@ -1,0 +1,29 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.autosuggestField({
+	first: true,
+	label: "Host"|t,
+	name: "host",
+  value: settings.host ?? "$MEILISEARCH_HOST",
+  placeholder: "$MEILISEARCH_HOST or http://meilisearch:7700 or http://127.0.0.1:7700",
+  suggestEnvVars: true,
+	required: true,
+}) }}
+
+{{ forms.autosuggestField({
+	label: "Admin Key"|t,
+	name: "adminKey",
+	value: settings.adminKey ?? "$MEILISEARCH_ADMIN_KEY",
+  placeholder: "$MEILISEARCH_ADMIN_KEY",
+  suggestEnvVars: true,
+	required: true,
+}) }}
+
+{{ forms.autosuggestField({
+	label: "Search Key"|t,
+	name: "searchKey",
+	value: settings.searchKey ?? "$MEILISEARCH_SEARCH_KEY",
+	placeholder: "$MEILISEARCH_SEARCH_KEY",
+	suggestEnvVars: true,
+	required: true,
+}) }}

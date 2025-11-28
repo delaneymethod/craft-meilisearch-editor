@@ -1,0 +1,76 @@
+{
+  "name": "delaneymethod/craft-meilisearch-editor",
+  "description": "Manage your Meilisearch content without a developer.",
+  "type": "craft-plugin",
+  "version": "1.0.0",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "meilisearch",
+		"editor",
+    "content editor",
+		"meilisearch editor"
+  ],
+	"support": {
+		"email": "hello@delaneymethod.com",
+		"issues": "https://github.com/delaneymethod/craft-meilisearch-editor/issues?state=open",
+		"docs": "https://github.com/delaneymethod/craft-meilisearch-editor"
+	},
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "DelaneyMethod",
+      "homepage": "https://delaneymethod.com"
+    }
+  ],
+  "require": {
+    "php": "^8.0",
+		"craftcms/cms": "^4.0||^5.0",
+    "meilisearch/meilisearch-php": "^1.8"
+  },
+	"require-dev": {
+		"symplify/easy-coding-standard": "^10.3",
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
+    "friendsofphp/php-cs-fixer": "^3.87",
+    "phpunit/phpunit": "^9.3.0",
+    "spacecatninja/imager-x": "^5.1",
+    "spicyweb/craft-neo": "^5.1",
+    "verbb/super-table": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "delaneymethod\\meilisearcheditor\\": "src/",
+			"delaneymethod\\meilisearcheditor\\tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test:unit": "vendor/bin/phpunit --configuration ./phpunit.xml",
+    "check": "ecs check --ansi",
+    "fix": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
+  "extra": {
+    "name": "Meilisearch Editor",
+    "handle": "meilisearch-editor",
+    "hasCpSettings": true,
+    "hasCpSection": true,
+    "schemaVersion": "1.0.0",
+    "class": "delaneymethod\\meilisearcheditor\\MeilisearchEditor",
+    "developer": "DelaneyMethod",
+    "developerUrl": "https://delaneymethod.com",
+    "documentationUrl": "https://github.com/delaneymethod/craft-meilisearch-editor",
+    "changelogUrl": "https://raw.githubusercontent.com/delanemethod/craft-meilisearch-editor/CHANGELOG.md"
+  },
+  "prefer-stable": true,
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "craftcms/plugin-installer": false,
+      "php-http/discovery": true,
+      "yiisoft/yii2-composer": true
+    }
+  }
+}

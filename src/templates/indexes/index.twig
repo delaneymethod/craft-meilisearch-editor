@@ -1,0 +1,139 @@
+{% extends "_layouts/cp" %}
+
+{% set title = "Indexes"|t %}
+
+{% set crumbs = [{
+	label: "Meilisearch Editor"|t,
+	url: url("meilisearch-editor/indexes"),
+}, {
+	label: "Indexes"|t,
+	url: url("meilisearch-editor/indexes"),
+}] %}
+
+{% block actionButton %}
+	<div class="buttons">
+		<div class="btngroup submit">
+			<a href="{{ url('meilisearch-editor/indexes/new') }}" title="{{ 'New index'|t }}" class="btn submit add icon">{{ "New index"|t }}</a>
+		</div>
+	</div>
+{% endblock %}
+
+{% css %}
+	.indexes thead th,
+	.indexes tbody td {
+		width: auto;
+	}
+
+	.indexes tbody td .light {
+		margin: 2px 0;
+		line-height: 1.2;
+	}
+
+	.indexes tbody td .light em {
+		color: var(--gray-500);
+	}
+
+	.indexes thead th:last-child,
+	.indexes tbody td:last-child {
+		width: 1%;
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	.indexes td:last-child .buttons {
+		gap: 6px;
+		flex-wrap: nowrap;
+		display: inline-flex;
+	}
+{% endcss %}
+
+{% block content %}
+	<table class="indexes data fullwidth">
+		<thead>
+			<tr>
+				<th scope="col">{{ "Label"|t }}</th>
+				<th scope="col">{{ "Handle"|t }}</th>
+				<th scope="col">{{ "Site-Aware"|t }}</th>
+				<th scope="col">{{ "Enabled"|t }}</th>
+				<th scope="col">{{ "Total Documents"|t }}</th>
+				<th scope="col">{{ "Filterables"|t }}</th>
+				<th scope="col">{{ "Sortables"|t }}</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for index in indexes %}
+				{% set health = healths[index.handle] ?? [] %}
+				<tr data-title="{{ index.label }}">
+					<td><a href="{{ url('meilisearch-editor/indexes/' ~ index.handle) }}" title="{{ index.label }}">{{ index.label }}</a></td>
+					<td><code>{{ index.handle }}</code></td>
+					<td>{{ index.siteAware ? "Yes"|t : "No"|t }}</td>
+					<td>{{ index.enabled ? "Yes"|t : "No"|t }}</td>
+					<td>{{ index.totalDocuments ?? 0 }}</td>
+					<td>
+						{% if health|length %}
+							{% for row in health %}
+								<div class="light">
+									{% if row.siteId %}<strong>Site {{ row.siteId }}:</strong> {% endif %}
+									{% if row.filterable|length %}
+										{{ row.filterable|join(", ") }}
+									{% else %}
+										<em>-</em>
+									{% endif %}
+								</div>
+							{% endfor %}
+						{% else %}
+							<em class="light">{{ "N/A"|t }}</em>
+						{% endif %}
+					</td>
+					<td>
+						{% if health|length %}
+							{% for row in health %}
+								<div class="light">
+									{% if row.siteId %}<strong>Site {{ row.siteId }}:</strong> {% endif %}
+									{% if row.sortable|length %}
+										{{ row.sortable|join(", ") }}
+									{% else %}
+										<em>-</em>
+									{% endif %}
+								</div>
+							{% endfor %}
+						{% else %}
+							<em class="light">{{ "N/A"|t }}</em>
+						{% endif %}
+					</td>
+					<td>
+						<div class="buttons flex">
+							<div class="btngroup">
+								<button type="submit" class="btn small" form="reindex-{{ index.handle }}" {{ not isClientAvailable ? 'disabled class="btn small disabled"' }}>{{ "Reindex"|t }}</button>
+								<button type="submit" class="btn small" form="flush-{{ index.handle }}" {{ not isClientAvailable ? 'disabled class="btn small disabled"' }}>{{ "Flush"|t }}</button>
+								<button type="submit" class="btn small danger icon" form="delete-{{ index.handle }}" {{ not isClientAvailable ? 'disabled class="btn small danger icon disabled"' }} onclick="return confirm('{{ "Are you sure you want to delete?"|t|e("js") }}');">{{ "Delete"|t }}</button>
+							</div>
+							<form id="reindex-{{ index.handle }}" method="post">
+								{{ csrfInput() }}
+								{{ actionInput("meilisearch-editor/indexes/reindex") }}
+								<input type="hidden" name="handle" value="{{ index.handle }}">
+							</form>
+							<form id="flush-{{ index.handle }}" method="post">
+								{{ csrfInput() }}
+								{{ actionInput("meilisearch-editor/indexes/flush") }}
+								<input type="hidden" name="handle" value="{{ index.handle }}">
+							</form>
+							<form id="delete-{{ index.handle }}" method="post">
+								{{ csrfInput() }}
+								{{ actionInput("meilisearch-editor/indexes/delete") }}
+								<input type="hidden" name="handle" value="{{ index.handle }}">
+							</form>
+						</div>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="6">
+						{{ "No indexes found."|t }}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
